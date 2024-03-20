@@ -1,15 +1,23 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { createUserDto } from './dto/create-user.dto';
 
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
   async register(user: createUserDto): Promise<void> {
@@ -47,8 +55,8 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
-    return { accessToken: 'fakeToken' };
+    const payload: JwtPayload = { username };
+    return { accessToken: this.jwtService.sign(payload) };
   }
 
   private async hashPassword(password: string, salt: string): Promise<string> {
