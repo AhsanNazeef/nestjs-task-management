@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/auth/user.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('tasks')
 export class Task {
@@ -13,6 +14,12 @@ export class Task {
 
   @Column({ default: 'OPEN' })
   status: TaskStatus;
+
+  @ManyToOne(() => Task, (task) => task.user, { eager: false })
+  user: User;
+
+  @Column()
+  userId: number;
 }
 
 export enum TaskStatus {
