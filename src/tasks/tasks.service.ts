@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { createTaskDto } from './dto/create-task.dto';
 import { getTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +8,7 @@ import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class TasksService {
+  private logger = new Logger('TasksService');
   constructor(
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
@@ -37,6 +38,7 @@ export class TasksService {
       where: { id, userId: user.id },
     });
     if (!task) {
+      this.logger.error(`Task not found with id '${id}' `);
       throw new NotFoundException(`Task not found with id '${id}' `);
     }
     return task;
